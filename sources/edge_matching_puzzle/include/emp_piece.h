@@ -33,16 +33,30 @@ namespace edge_matching_puzzle
     friend std::ostream & operator<<(std::ostream & p_stream,const emp_piece & p_piece);
   public:
     typedef enum class auto_similarity {NONE=0,HALF_SIMILAR,SIMILAR} t_auto_similarity;
-    inline emp_types::t_kind get_kind(void)const;
     inline emp_piece(const emp_types::t_piece_id & p_id,
                      const std::array<emp_types::t_color_id,((unsigned int)(emp_types::t_orientation::WEST))+1> & p_colours);
+    inline emp_types::t_kind get_kind(void)const;
     inline const emp_types::t_color_id & get_color(const emp_types::t_orientation & p_border)const;
     inline const emp_types::t_color_id & get_color(const emp_types::t_orientation & p_border,
                                                    const emp_types::t_orientation & p_orientation)const;
     inline const emp_types::t_piece_id & get_id(void)const;  
     inline const t_auto_similarity & get_auto_similarity(void)const;
     inline static const std::string & auto_similarity2string(const t_auto_similarity & p_similarity);
+
+    /**
+       Return true if two pieces are identical ( even if rotation is needed
+    **/
     inline bool operator==(const emp_piece & p_piece)const;
+
+    /**
+       Return true if pieces are identical with second piece rotated as indicated in orientation parameter
+    **/
+    inline bool compare_to(const emp_piece & p_piece, const emp_types::t_orientation & p_orient)const;
+
+    inline const emp_types:: t_binary_piece get_bitfield_representation(const emp_types::t_orientation & p_orientation,
+									const unsigned & p_id_size,
+									const unsigned & p_color_code_size,
+                                                                        const unsigned int & p_border_color_id);
 #if GCC_VERSION > 40702
   protected:
 #endif // GCC_VERSION > 40702
@@ -133,21 +147,31 @@ namespace edge_matching_puzzle
     bool emp_piece::operator==(const emp_piece & p_piece)const
     {
       if(m_id == p_piece.m_id) return true;
-      unsigned int l_increment = pow(2,(unsigned int) m_auto_similarity);
       unsigned int l_other_increment = pow(2,(unsigned int) p_piece.get_auto_similarity());
       // Compare color array for different orientations
       for(unsigned int l_piece_orient_index = (unsigned int)emp_types::t_orientation::NORTH ;
           l_piece_orient_index <= (unsigned int)emp_types::t_orientation::WEST; 
           l_piece_orient_index += l_other_increment)
         {
-          unsigned int l_color_orient_index = (unsigned int)emp_types::t_orientation::NORTH; 
-          while(m_colours[l_color_orient_index] == p_piece.get_color((emp_types::t_orientation)l_color_orient_index,(emp_types::t_orientation)l_piece_orient_index) && l_color_orient_index <= (unsigned int)emp_types::t_orientation::WEST)
-            { 
-              l_color_orient_index += l_increment;
-            }
-          if(l_color_orient_index > (unsigned int)emp_types::t_orientation::WEST) return true;
+	  if(compare_to(p_piece,(emp_types::t_orientation)l_piece_orient_index)) return true;
         }
       return false;
+    }
+
+
+    //--------------------------------------------------------------------------
+    bool emp_piece::compare_to(const emp_piece & p_piece, const emp_types::t_orientation & p_orient)const
+    {
+      if(m_id == p_piece.m_id) return true;
+      unsigned int l_color_orient_index = (unsigned int)emp_types::t_orientation::NORTH; 
+      unsigned int l_increment = pow(2,(unsigned int) m_auto_similarity);
+      while(m_colours[l_color_orient_index] == p_piece.get_color((emp_types::t_orientation)l_color_orient_index,p_orient) && l_color_orient_index <= (unsigned int)emp_types::t_orientation::WEST)
+	{
+	  l_color_orient_index += l_increment;
+	}
+      if(l_color_orient_index > (unsigned int)emp_types::t_orientation::WEST) return true;
+      return false;
+
     }
 
     //--------------------------------------------------------------------------
@@ -161,6 +185,31 @@ namespace edge_matching_puzzle
       {
         return m_colours;
       }
+
+    //--------------------------------------------------------------------------
+    const emp_types::t_binary_piece emp_piece::get_bitfield_representation(const emp_types::t_orientation & p_orientation,
+                                                                           const unsigned & p_id_size,
+                                                                           const unsigned & p_color_code_size,
+                                                                           const unsigned int & p_border_color_id)
+    {
+      emp_types::t_binary_piece l_result = (m_id - 1 ) << 2;
+      l_result |= (emp_types::t_binary_piece) p_orientation;
+      for(unsigned int l_index = 0 ; l_index < 4 ; ++l_index)
+        {
+          l_result = l_result << p_color_code_size;
+          emp_types::t_color_id l_color_id = get_color((emp_types::t_orientation)(3 - l_index),p_orientation);
+          assert(l_color_id < p_border_color_id);
+          if(l_color_id)
+            {
+              l_result |= l_color_id;
+            }
+          else
+            {
+              l_result |= p_border_color_id;
+            }
+        }
+      return l_result;
+    }
 
 }
 

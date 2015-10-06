@@ -39,7 +39,7 @@ namespace edge_matching_puzzle
     inline emp_gui(const unsigned int & p_puzzle_width,
                    const unsigned int & p_puzzle_height,
                    const std::string & p_ressources,
-                   std::vector<emp_piece> p_pieces);
+                   const std::vector<emp_piece> & p_pieces);
 
     inline void set_piece(const unsigned int & p_x,
                           const unsigned int & p_y,
@@ -47,6 +47,7 @@ namespace edge_matching_puzzle
                           const emp_types::t_orientation & p_orientation);
     inline void display(const emp_FSM_situation & p_situation);
     inline ~emp_gui(void);
+    inline const lib_bmp::my_bmp & get_picture(const unsigned int & p_piece_id)const;
   private:
     inline void set_piece_without_lock(const unsigned int & p_x,
                                        const unsigned int & p_y,
@@ -77,7 +78,7 @@ namespace edge_matching_puzzle
   emp_gui::emp_gui(const unsigned int & p_puzzle_width,
                    const unsigned int & p_puzzle_height,
                    const std::string & p_ressources,
-                   std::vector<emp_piece> p_pieces):
+                   const std::vector<emp_piece> & p_pieces):
     simple_gui(),
     m_puzzle_width(p_puzzle_width),
     m_puzzle_height(p_puzzle_height),
@@ -93,10 +94,19 @@ namespace edge_matching_puzzle
       
       this->get_screen_info(l_screen_width,l_screen_height,l_screen_bits_per_pixel);
       std::cout << "Resolution = " << l_screen_width << " * " << l_screen_height << " : " << l_screen_bits_per_pixel << " bits/pixel" << std::endl;
-
+      if(!l_screen_width || !l_screen_height)
+        {
+          l_screen_width = 800;
+          l_screen_height = 600;
+        }
       // Get available ressources
       std::vector<std::string> l_file_list;
       quicky_utils::quicky_files::list_content(p_ressources,l_file_list);
+
+      if(!l_file_list.size())
+        {
+	  throw quicky_exception::quicky_logic_exception("Unable to find any files in \"" + p_ressources + "\"",__LINE__,__FILE__);
+        }
 
       for(std::vector<std::string>::const_iterator l_iter = l_file_list.begin();
           l_iter != l_file_list.end();
@@ -115,7 +125,7 @@ namespace edge_matching_puzzle
       std::cout << "Best fit ressource is " << m_piece_size << std::endl ;
       for(unsigned int l_index = 0 ; l_index < p_pieces.size() ; ++l_index)
         {
-          m_pieces_pictures[l_index] = new lib_bmp::my_bmp(m_piece_size,m_piece_size,32);
+          m_pieces_pictures[l_index] = new lib_bmp::my_bmp(m_piece_size,m_piece_size,24);
         }
       this->createWindow(p_puzzle_width * m_piece_size + (p_puzzle_width - 1) * m_separator_size ,p_puzzle_height * m_piece_size + (p_puzzle_height - 1) * m_separator_size);
 
@@ -275,6 +285,15 @@ namespace edge_matching_puzzle
         } 
       unlock();
     }
+
+    //--------------------------------------------------------------------------
+    const lib_bmp::my_bmp & emp_gui::get_picture(const unsigned int & p_piece_id)const
+      {
+	assert(p_piece_id);
+	assert(p_piece_id <= m_nb_pieces);
+	return *(m_pieces_pictures[p_piece_id - 1]);
+      }
+
 }
 #endif //EMP_TYPES_H
 //EOF
