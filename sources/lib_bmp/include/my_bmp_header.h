@@ -39,10 +39,10 @@ namespace lib_bmp
     inline uint32_t get_palette_size(void)const;
     inline void display(void)const;
 
-    inline uint16_t get_nb_bits_per_pixel(void)const;
-    inline uint32_t get_width(void)const;
-    inline uint32_t get_height(void)const;
-    inline uint32_t get_picture_size(void)const;
+    inline const uint16_t & get_nb_bits_per_pixel(void)const;
+    inline const uint32_t & get_width(void)const;
+    inline const uint32_t & get_height(void)const;
+    inline const uint32_t & get_picture_size(void)const;
 
   private:
     inline uint32_t compute_picture_size(uint32_t p_width,
@@ -180,25 +180,25 @@ namespace lib_bmp
       }
 
       //----------------------------------------------------------------------------
-      uint16_t my_bmp_header::get_nb_bits_per_pixel(void)const
+      const uint16_t & my_bmp_header::get_nb_bits_per_pixel(void)const
       {
 	return m_nb_bits_per_pixel;
       }
 
       //----------------------------------------------------------------------------
-      uint32_t my_bmp_header::get_width(void)const
+      const uint32_t & my_bmp_header::get_width(void)const
       {
 	return m_picture_width;
       }
 
       //----------------------------------------------------------------------------
-      uint32_t my_bmp_header::get_height(void)const
+      const uint32_t & my_bmp_header::get_height(void)const
       {
 	return m_picture_height;
       }
 
       //----------------------------------------------------------------------------
-      uint32_t my_bmp_header::get_picture_size(void)const
+      const uint32_t & my_bmp_header::get_picture_size(void)const
       {
 	return m_picture_size;
       }

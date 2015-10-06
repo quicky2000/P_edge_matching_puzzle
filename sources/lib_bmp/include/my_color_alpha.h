@@ -25,6 +25,7 @@ namespace lib_bmp
 {
   class my_color_alpha: public my_color
   {
+    friend std::ostream & operator<<(std::ostream & p_stream,const my_color_alpha & p_color);
   public:
     inline my_color_alpha(uint8_t p_R,uint8_t p_G,uint8_t p_B,uint8_t p_alpha=0);
     inline my_color_alpha(void);
@@ -80,25 +81,32 @@ namespace lib_bmp
 
 
   //----------------------------------------------------------------------------
-    my_color_alpha::my_color_alpha(void):
-      my_color(),
-      m_alpha(0)
-	{
-	}
-  //----------------------------------------------------------------------------
-      void my_color_alpha::display(void)const
-      {
-	my_color::display();
-	std::cout << ", A=" << std::setw(3) << (uint32_t)m_alpha ;
-      }
+  my_color_alpha::my_color_alpha(void):
+    my_color(),
+    m_alpha(0)
+  {
+  }
 
   //----------------------------------------------------------------------------
-      uint8_t my_color_alpha::get_alpha(void)const
-      {
-	return m_alpha;
-      }
+  void my_color_alpha::display(void)const
+  {
+    my_color::display();
+    std::cout << ", A=" << std::setw(3) << (uint32_t)m_alpha ;
+  }
 
+  //----------------------------------------------------------------------------
+  uint8_t my_color_alpha::get_alpha(void)const
+  {
+    return m_alpha;
+  }
 
+  //----------------------------------------------------------------------------
+  inline std::ostream & operator<<(std::ostream & p_stream,const my_color_alpha & p_color)
+  {
+    p_stream << (my_color)p_color;
+    p_stream << ", A=" << std::setw(3) << (uint32_t)p_color.m_alpha ;
+    return p_stream;
+  }
 }
 #endif // MY_COLOR_ALPHA_H
 //EOF

@@ -40,9 +40,11 @@ namespace lib_bmp
 		  uint32_t p_height,
 		  uint32_t p_nb_bits_per_pixel);
     inline my_bmp(const std::string & p_name);
-    inline uint32_t get_width(void)const;
-    inline uint32_t get_height(void)const;
+    inline const uint32_t & get_width(void)const;
+    inline const uint32_t & get_height(void)const;
+    inline const uint16_t & get_nb_bits_per_pixel(void)const;
     static inline uint32_t get_default_palette_size(uint32_t p_nb_bits);
+    inline const my_palette & get_palette(void)const;
     inline void save(const std::string & p_name)const;
     inline const my_color_alpha & get_pixel_color(uint32_t p_x,
 						  uint32_t p_y)const;
@@ -153,22 +155,35 @@ namespace lib_bmp
 	}
 
       //----------------------------------------------------------------------------
-      uint32_t my_bmp::get_width(void)const
+      const uint32_t & my_bmp::get_width(void)const
       {
 	return m_header->get_width();
       }
 
       //----------------------------------------------------------------------------
-      uint32_t my_bmp::get_height(void)const
+      const uint32_t & my_bmp::get_height(void)const
       {
 	return m_header->get_height();
       }
+
+      //----------------------------------------------------------------------------
+      const uint16_t & my_bmp::get_nb_bits_per_pixel(void)const
+        {
+          return m_header->get_nb_bits_per_pixel();
+        }
 
       //----------------------------------------------------------------------------
       uint32_t my_bmp::get_default_palette_size(uint32_t p_nb_bits)
 	{
 	  return (p_nb_bits >= 16 ? 0 : 1 << p_nb_bits);
 	}
+
+      //----------------------------------------------------------------------------
+      const my_palette & my_bmp::get_palette(void)const
+      {
+        if(m_palette) return *m_palette;
+        throw quicky_exception::quicky_logic_exception("Try to access to palette which do not exist",__LINE__,__FILE__);
+      }
 
       //----------------------------------------------------------------------------
       void my_bmp::save(const std::string & p_name)const

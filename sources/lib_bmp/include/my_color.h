@@ -27,6 +27,7 @@ namespace lib_bmp
 {
   class my_color
   {
+    friend std::ostream & operator<<(std::ostream & p_stream,const my_color & p_color);
   public:
     inline my_color(void);
     inline my_color(uint8_t p_R,
@@ -176,7 +177,12 @@ namespace lib_bmp
 	std::cout << "R=" << std::setw(3) << (uint32_t)m_R << ", G=" << std::setw(3) << (uint32_t)m_G << ", B=" << std::setw(3) << (uint32_t)m_B ;
       }
 
-
+      //----------------------------------------------------------------------------
+      inline std::ostream & operator<<(std::ostream & p_stream,const my_color & p_color)
+      {
+	p_stream << "R=" << std::setw(3) << (uint32_t)p_color.m_R << ", G=" << std::setw(3) << (uint32_t)p_color.m_G << ", B=" << std::setw(3) << (uint32_t)p_color.m_B ;
+	return p_stream;
+      }
 }
 #endif // MY_COLOR_H
 //EOF

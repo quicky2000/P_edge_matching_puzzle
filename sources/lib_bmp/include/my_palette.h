@@ -34,10 +34,11 @@ namespace lib_bmp
 		      FILE *p_file=NULL);
     inline void save(FILE *p_file);
     inline const uint32_t get_index(const my_color_alpha & p_color)const;
-    inline const my_color_alpha & get_color(uint32_t p_index);
+    inline const my_color_alpha & get_color(uint32_t p_index)const;
     inline void set_color(const my_color_alpha & p_color,
 			  uint32_t p_index);
     inline void display(void)const;
+    inline const uint32_t & get_size(void)const;
     inline ~my_palette(void);
   private:
     uint32_t m_size;
@@ -355,6 +356,12 @@ namespace lib_bmp
       }
     
     //----------------------------------------------------------------------------
+    const uint32_t & my_palette::get_size(void)const
+      {
+        return m_size;
+      }
+
+    //----------------------------------------------------------------------------
     void my_palette::save(FILE *p_file)
     {
       uint8_t l_byte_array[4];
@@ -392,7 +399,7 @@ namespace lib_bmp
     }
 
     //----------------------------------------------------------------------------
-    const my_color_alpha & my_palette::get_color(uint32_t p_index)
+    const my_color_alpha & my_palette::get_color(uint32_t p_index)const
       {
 	assert(p_index < m_size);
 	return *(m_colors[p_index]);
