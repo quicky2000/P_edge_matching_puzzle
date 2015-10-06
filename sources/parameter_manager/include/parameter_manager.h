@@ -86,7 +86,14 @@ namespace parameter_manager
     //----------------------------------------------------------------------------
     void parameter_manager::treat_parameters(int argc, char ** argv)
     {
-      assert(m_nb_mandatory <= m_ordered_parameters.size());
+      if(m_nb_mandatory != m_ordered_parameters.size())
+      {
+        std::stringstream l_mandatory_stream ;
+        l_mandatory_stream << m_nb_mandatory;
+        std::stringstream l_nb_stream;
+        l_nb_stream << m_ordered_parameters.size();
+        throw quicky_exception::quicky_logic_exception("Number of defined mandatory parameters ("+l_nb_stream.str()+") is different than number of mandatory parameters declared ("+l_mandatory_stream.str()+")",__LINE__,__FILE__);
+      }
       uint32_t l_nb_ordered_parameters_encountered = 0;
       for(int32_t l_index = 1;l_index< argc;++l_index)
 	{
@@ -200,7 +207,7 @@ namespace parameter_manager
       l_stream << std::endl ;
       if(m_prefixed_parameters.size())
 	{
-	  l_stream << "OPTIONS : " << m_prefix << "<paremeter_name>=<parameter_value>" << std::endl ;
+	  l_stream << "OPTIONS : " << m_prefix << "<parameter_name>=<parameter_value>" << std::endl ;
 	  std::map<std::string,parameter_if*>::const_iterator l_iter = m_prefixed_parameters.begin();
 	  std::map<std::string,parameter_if*>::const_iterator l_iter_end = m_prefixed_parameters.end();
 	  while(l_iter != l_iter_end)
